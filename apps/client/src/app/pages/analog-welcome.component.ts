@@ -7,7 +7,7 @@ import { injectTrpcClient } from '../../trpc-client';
 import { Note } from '../../note';
 
 @Component({
-  selector: 'client-analog-welcome',
+  selector: 'mkp-analog-welcome',
   standalone: true,
   imports: [AsyncPipe, FormsModule, NgFor, DatePipe, NgIf],
   host: {
