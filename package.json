@@ -2,7 +2,14 @@
   "name": "@optee/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "build:showcase": "npx nx build showcase",
+    "build: marketplace": "npx nx build marketplace",
+    "nx:graph": "npx nx graph",
+    "nx:affected": "npx nx affected -t lint test e2e build",
+    "serve:marketplace": "npx nx serve marketplace",
+    "serve:showcase": "npx nx serve showcase"
+  },
   "private": true,
   "dependencies": {
     "@analogjs/content": "^1.3.0",
