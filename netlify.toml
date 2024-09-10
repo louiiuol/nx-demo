@@ -1,0 +1,35 @@
+[build]
+  command = "bash ./scripts/netlify-build-affected.sh"
+  publish = "dist/apps/$NETLIFY_AFFECTED_PROJECT"
+  functions = "dist/marketplace/analog"
+
+[build.environment]
+  # Source: https://github.com/cypress-io/netlify-plugin-cypress?tab=readme-ov-file#recommended
+  # cache Cypress binary in local "node_modules" folder
+  # so Netlify caches it
+  CYPRESS_CACHE_FOLDER = "./node_modules/CypressBinary"
+  # set TERM variable for terminal output
+  TERM = "xterm"
+
+[context.production]
+  command = "bash ./scripts/netlify-build-affected.sh"
+
+[context.deploy-preview]
+  command = "bash ./scripts/netlify-build-affected.sh"
+
+[context.production.environment]
+  VITE_SUPABASE_URL = "https://gcdtvcinxfjuytqyqqkv.supabase.co"
+  VITE_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZHR2Y2lueGZqdXl0cXlxcWt2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjA3MDkwMDcsImV4cCI6MjAzNjI4NTAwN30.ctnNT3cYW2nVZyiHQ8Kd3DYu4BFxQj_63C447dsT2PU"
+
+[context.deploy-preview.environment]
+  VITE_SUPABASE_URL = "https://taqnqndjphgldgfwvrjf.supabase.co"
+  VITE_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhcW5xbmRqcGhnbGRnZnd2cmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTgwMTA5OTQsImV4cCI6MjAzMzU4Njk5NH0.FS8M7nk3Jwz66lkLyT8P16IMijlxZTlmpbxtWzbYBVo"
+
+[context.branch-deploy.environment]
+  VITE_SUPABASE_URL = "https://taqnqndjphgldgfwvrjf.supabase.co"
+  VITE_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhcW5xbmRqcGhnbGRnZnd2cmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTgwMTA5OTQsImV4cCI6MjAzMzU4Njk5NH0.FS8M7nk3Jwz66lkLyT8P16IMijlxZTlmpbxtWzbYBVo"
+
+[[plugins]]
+package = "netlify-plugin-cypress"
+  [plugins.inputs]
+  record = true
