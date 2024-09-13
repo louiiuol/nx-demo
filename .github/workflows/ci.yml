@@ -39,7 +39,7 @@ jobs:
 
       # Récupération du code
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       # Initialisation de NodeJS (basée sur la version du fichier .nvmrc)
       - name: Setup Node.js via nvm
