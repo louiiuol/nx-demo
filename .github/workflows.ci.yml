@@ -4,6 +4,9 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 # Needed for nx-set-shas when run on the main branch
 permissions:
