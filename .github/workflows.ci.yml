@@ -1,0 +1,114 @@
+name: Run e2e tests, apply migrations to staging DB and deploy Netlify preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+# Needed for nx-set-shas when run on the main branch
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Initialisation des variables d'environnement (Github secrets)
+      - name: Initialiser les secrets d'environnement
+        run: echo "Secrets initialisés"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_URL: 'http://127.0.0.1:54321'
+          SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
+          SUPABASE_DB_URL: 'postgresql://postgres:postgres@127.0.0.1:54322/postgres'
+          DATABASE_URL: 'postgresql://postgres:postgres@127.0.0.1:54322/postgres'
+          DEPLOY_PRIME_URL: 'http://localhost:4200'
+          VITE_SUPABASE_URL: 'http://127.0.0.1:54321'
+          VITE_SUPABASE_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }} # pass the Cypress Cloud record key as an environment variable
+          CYPRESS_PROJECT_ID: ${{ secrets.PROJECT_ID }} # pass the project ID from the secrets through environment variable
+          COMMIT_INFO_BRANCH: ${{ github.ref_name }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+
+      # Récupération du code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Initialisation de NodeJS (basée sur la version du fichier .nvmrc)
+      - name: Setup Node.js via nvm
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      # Restauration des modules NodeJS depuis le cache
+      - name: Restore cached node modules
+        id: restore-node-modules
+        uses: actions/cache/restore@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      # Installation des dépendances manquantes
+      - name: Install dependencies
+        if: steps.restore-node-modules.outputs.cache-hit != 'true'
+        run: npm ci
+
+      #  Enregistrement des modules NodeJS dans le cache
+      - name: Save node modules after pre-bundling dependencies (vite)
+        id: cache-node-modules
+        uses: actions/cache/save@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
+      # - name: Clear NX cache
+      #   run: npx nx reset
+
+      - name: Set NX shas
+        uses: nrwl/nx-set-shas@v4
+
+      # Plugin NX pour la gestion des shas
+      # - uses: mansagroup/nrwl-nx-action@v3
+      #   with:
+      #     args: --verbose=true
+      #     targets: lint,test,
+
+      # Lancement des tests unitaires
+      - name: Unit tests
+        run: npm run nx:affected
+
+      # Initialisation de Supabase
+      # - name: Setup Supabase CLI
+      #   uses: supabase/setup-cli@v1
+      #   with:
+      #     version: latest
+
+      # Lancer les migrations via Supabase branches
+      # - name: Lancer les migrations
+      #   run: supabase db push --schema <votre_schema>
+
+      # Etapes 9 : Lancement de supabase local
+      # - name: Start Supabase local development setup
+      #   run: supabase db start
+
+      #  Lancement des tests end-to-end
+      # - name: Lancer les tests end-to-end
+      #   run: npm run nx:affected:e2e
+
+      # Required to make Netlify deploy preview work
+      # As long as Supabase branches are not an option we might destroy the staging database for other PRs
+      # - name: Link to staging Supabase project
+      #   run: supabase link --project-ref $SUPABASE_PROJECT_ID
+
+      # - name: Apply SQL migration to staging DB
+      #   run: supabase db push
+
+    # Clear cache
+    # - name: Clear cache
+    #   run: npm cache clean --force
