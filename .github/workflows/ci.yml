@@ -76,15 +76,15 @@ jobs:
       - name: Set NX shas
         uses: nrwl/nx-set-shas@v4
 
-      # Plugin NX pour la gestion des shas
-      # - uses: mansagroup/nrwl-nx-action@v3
-      #   with:
-      #     args: --verbose=true
-      #     targets: lint,test,
+      #Plugin NX pour la gestion des shas
+      - uses: mansagroup/nrwl-nx-action@v3
+        with:
+          args: --verbose=true
+          targets: lint,test
 
       # Lancement des tests unitaires
-      - name: Unit tests
-        run: npm run nx:affected
+      # - name: Unit tests
+      #   run: npm run nx:affected
 
       # Initialisation de Supabase
       # - name: Setup Supabase CLI
