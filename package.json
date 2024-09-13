@@ -6,7 +6,7 @@
     "build:showcase": "npx nx build showcase",
     "build:marketplace": "npx nx build client",
     "nx:graph": "npx nx graph",
-    "nx:affected": "npx nx affected -t lint test e2e build",
+    "nx:affected": "npx nx affected -t lint test --verbose",
     "serve:marketplace": "npx nx serve client",
     "serve:showcase": "npx nx serve showcase"
   },
